@@ -1,5 +1,7 @@
 package com.satwik.employeeManagementSystem;
 
+import com.satwik.employeeManagementSystem.Valid.Add;
+import com.satwik.employeeManagementSystem.Valid.Update;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -14,37 +16,41 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotNull
+
+    @NotNull(groups = {Add.class, Update.class})
     private String name;
 
-    @NotNull
+    @NotNull(groups = Add.class)
     @Email
     @Column(unique = true)
     private String email;
 
-    @NotNull
+    @NotNull(groups = Add.class)
     private String phoneNumber;
 
-    @NotNull
+    @NotNull(groups = Add.class)
     private String address;
 
-    @NotNull
+    @NotNull(groups = Add.class)
     private LocalDate dateOfBirth;
 
-    @NotNull
+    @NotNull(groups = Add.class)
     private LocalDate joiningDate;
 
-    @NotNull
+    @NotNull(groups = {Add.class, Update.class})
     private String designation;
 
-    @NotNull
+    @NotNull(groups = {Add.class, Update.class})
     private String department;
 
-    @NotNull
-    private String employmentType; // FULL_TIME, INTERN, CONTRACT
+    @NotNull(groups = {Add.class, Update.class})
+    private String employmentType;
 
-    @NotNull
+    @NotNull(groups = {Add.class, Update.class})
     private Double salary;
+
+    @NotNull(groups = {Add.class, Update.class})
+    private String status;
 
     public Integer getId() {
         return id;
@@ -141,8 +147,5 @@ public class Employee {
     public void setStatus(String status) {
         this.status = status;
     }
-
-    @NotNull
-    private String status; // ACTIVE, INACTIVE, RESIGNED
 
 }

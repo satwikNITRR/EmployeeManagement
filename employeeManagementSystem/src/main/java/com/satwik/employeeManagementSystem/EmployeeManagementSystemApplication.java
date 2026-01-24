@@ -9,7 +9,7 @@ public class EmployeeManagementSystemApplication {
 	public static void main(String[] args) {
 
         SpringApplication.run(EmployeeManagementSystemApplication.class, args);
-        System.out.print("HElllo");
+        System.out.print("Hello");
 	}
 
 }
