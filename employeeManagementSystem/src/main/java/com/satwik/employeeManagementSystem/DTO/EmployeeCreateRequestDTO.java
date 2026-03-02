@@ -1,28 +1,43 @@
 package com.satwik.employeeManagementSystem.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 
-public class EmployeeResponseDTO {
+public class EmployeeCreateRequestDTO {
 
-    private Integer id;
+    @NotBlank(message = "name is required")
     private String name;
+
+    @NotBlank(message = "email is required")
+    @Email(message = "email must be valid")
     private String email;
+
+    @NotBlank(message = "phoneNumber is required")
     private String phoneNumber;
+
+    @NotBlank(message = "address is required")
     private String address;
+
+    @NotNull(message = "dateOfBirth is required")
     private LocalDate dateOfBirth;
+
+    @NotNull(message = "joiningDate is required")
     private LocalDate joiningDate;
+
+    @NotBlank(message = "designation is required")
     private String designation;
+
+    @NotBlank(message = "department is required")
     private String department;
+
+    @NotBlank(message = "employmentType is required")
     private String employmentType;
+
+    @NotBlank(message = "status is required")
     private String status;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

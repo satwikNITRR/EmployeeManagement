@@ -1,98 +1,68 @@
-package com.satwik.employeeManagementSystem.Service;
+package com.satwik.employeeManagementSystem.service;
 
-import com.satwik.employeeManagementSystem.DTO.EmployeeResponseDTO;
-import com.satwik.employeeManagementSystem.Employee;
+import com.satwik.employeeManagementSystem.dto.EmployeeCreateRequestDTO;
+import com.satwik.employeeManagementSystem.dto.EmployeeResponseDTO;
+import com.satwik.employeeManagementSystem.dto.EmployeeUpdateRequestDTO;
+import com.satwik.employeeManagementSystem.entity.Employee;
+import com.satwik.employeeManagementSystem.exception.ConflictException;
+import com.satwik.employeeManagementSystem.exception.ResourceNotFoundException;
+import com.satwik.employeeManagementSystem.mapper.EmployeeMapper;
 import com.satwik.employeeManagementSystem.repository.EmployeeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class EmployeeService {
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
+    private final EmployeeMapper employeeMapper;
 
-    // -------- ADD EMPLOYEE --------
-    public Employee addEmployee(Employee employee) {
-
-        if (employeeRepository.existsByEmail(employee.getEmail())) {
-            throw new RuntimeException("Email already exists");
-        }
-
-        Employee newEmployee = new Employee();
-        newEmployee.setName(employee.getName());
-        newEmployee.setEmail(employee.getEmail());
-        newEmployee.setPhoneNumber(employee.getPhoneNumber());
-        newEmployee.setAddress(employee.getAddress());
-        newEmployee.setDateOfBirth(employee.getDateOfBirth());
-        newEmployee.setJoiningDate(employee.getJoiningDate());
-        newEmployee.setDesignation(employee.getDesignation());
-        newEmployee.setDepartment(employee.getDepartment());
-        newEmployee.setEmploymentType(employee.getEmploymentType());
-        newEmployee.setSalary(employee.getSalary());
-        newEmployee.setStatus(employee.getStatus());
-
-        return employeeRepository.save(newEmployee);
+    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper) {
+        this.employeeRepository = employeeRepository;
+        this.employeeMapper = employeeMapper;
     }
 
-    // -------- UPDATE EMPLOYEE --------
-    public Employee updateEmployee(Integer id, Employee employee) {
-
-        Employee existingEmployee = employeeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee not found with id " + id));
-
-        if (employee.getEmail() != null &&
-                employeeRepository.existsByEmailAndIdNot(employee.getEmail(), id)) {
-            throw new RuntimeException("Email already exists for another employee");
+    public EmployeeResponseDTO createEmployee(EmployeeCreateRequestDTO requestDTO) {
+        if (employeeRepository.existsByEmail(requestDTO.getEmail())) {
+            throw new ConflictException("Employee with email " + requestDTO.getEmail() + " already exists");
         }
 
-        // update only allowed fields
-        existingEmployee.setName(employee.getName());
-        existingEmployee.setDesignation(employee.getDesignation());
-        existingEmployee.setDepartment(employee.getDepartment());
-        existingEmployee.setEmploymentType(employee.getEmploymentType());
-        existingEmployee.setSalary(employee.getSalary());
-        existingEmployee.setStatus(employee.getStatus());
 
-        if (employee.getEmail() != null) {
-            existingEmployee.setEmail(employee.getEmail());
-        }
-
-        return employeeRepository.save(existingEmployee);
+        Employee employee = employeeMapper.toEntity(requestDTO);
+        Employee savedEmployee = employeeRepository.save(employee);
+        return employeeMapper.toResponseDTO(savedEmployee);
     }
 
-    // -------- GET ALL --------
     public List<EmployeeResponseDTO> getAllEmployees() {
-
-        List<Employee> employees = employeeRepository.findAll();
-        List<EmployeeResponseDTO> response = new ArrayList<>();
-
-            for (Employee employee : employees) {
-
-                EmployeeResponseDTO dto = new EmployeeResponseDTO();
-                dto.setId(employee.getId());
-                dto.setName(employee.getName());
-                dto.setEmail(employee.getEmail());
-                dto.setPhoneNumber(employee.getPhoneNumber());
-                dto.setDesignation(employee.getDesignation());
-                dto.setDepartment(employee.getDepartment());
-                dto.setEmploymentType(employee.getEmploymentType());
-                dto.setStatus(employee.getStatus());
-                dto.setJoiningDate(employee.getJoiningDate());
-
-                response.add(dto);
-            }
-
-            return response;
+        return employeeRepository.findAll().stream()
+                .map(employeeMapper::toResponseDTO)
+                .toList();
     }
 
-    // -------- DELETE --------
+    public EmployeeResponseDTO getEmployeeById(Integer id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id " + id));
+
+        return employeeMapper.toResponseDTO(employee);
+    }
+
+    public EmployeeResponseDTO updateEmployee(Integer id, EmployeeUpdateRequestDTO requestDTO) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id " + id));
+
+        if (employeeRepository.existsByEmailAndIdNot(requestDTO.getEmail(), id)) {
+            throw new ConflictException("Employee with email " + requestDTO.getEmail() + " already exists");
+        }
+
+        employeeMapper.updateEntity(employee, requestDTO);
+        Employee updatedEmployee = employeeRepository.save(employee);
+        return employeeMapper.toResponseDTO(updatedEmployee);
+    }
+
     public void deleteEmployee(Integer id) {
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id " + id));
 
         employeeRepository.delete(employee);
     }

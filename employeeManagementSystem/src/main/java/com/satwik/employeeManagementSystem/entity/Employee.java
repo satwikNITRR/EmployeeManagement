@@ -1,13 +1,12 @@
-package com.satwik.employeeManagementSystem;
+package com.satwik.employeeManagementSystem.entity;
 
-import com.satwik.employeeManagementSystem.Valid.Add;
-import com.satwik.employeeManagementSystem.Valid.Update;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Entity
 public class Employee {
@@ -16,40 +15,34 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-
-    @NotNull(groups = {Add.class, Update.class})
+    @Column(nullable = false)
     private String name;
 
-    @NotNull(groups = Add.class)
-    @Email
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @NotNull(groups = Add.class)
+    @Column(nullable = false)
     private String phoneNumber;
 
-    @NotNull(groups = Add.class)
+    @Column(nullable = false)
     private String address;
 
-    @NotNull(groups = Add.class)
+    @Column(nullable = false)
     private LocalDate dateOfBirth;
 
-    @NotNull(groups = Add.class)
+    @Column(nullable = false)
     private LocalDate joiningDate;
 
-    @NotNull(groups = {Add.class, Update.class})
+    @Column(nullable = false)
     private String designation;
 
-    @NotNull(groups = {Add.class, Update.class})
+    @Column(nullable = false)
     private String department;
 
-    @NotNull(groups = {Add.class, Update.class})
+    @Column(nullable = false)
     private String employmentType;
 
-    @NotNull(groups = {Add.class, Update.class})
-    private Double salary;
-
-    @NotNull(groups = {Add.class, Update.class})
+    @Column(nullable = false)
     private String status;
 
     public Integer getId() {
@@ -130,14 +123,6 @@ public class Employee {
 
     public void setEmploymentType(String employmentType) {
         this.employmentType = employmentType;
-    }
-
-    public Double getSalary() {
-        return salary;
-    }
-
-    public void setSalary(Double salary) {
-        this.salary = salary;
     }
 
     public String getStatus() {
